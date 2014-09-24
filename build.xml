@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Build.xml - Ant build file for the GUISort project
+Written By: Nicholas DiPasquale
+-->
+<project name="GUISort" default="compile" basedir="." >
+    <property file="build.properties" />
+
+    <property name="dest.filename" value="guisort.jar" />
+    <property name="version" value="1.0" />
+
+    <path id="compile.classpath" >
+        <fileset dir="libs" >
+	    <include name="*.jar" />
+	</fileset>
+    </path>
+
+    <target name="compile"
+     description="Compile and assemble the GUISort project"
+     >
+        <mkdir dir="bin" />
+
+	<javac srcdir="src"
+	 destdir="bin"
+	 deprecation="on"
+	 fork="yes" >
+	    <classpath refid="compile.classpath" />
+	</javac>
+
+	<jar destfile="${dest.filename}" basedir="bin" >
+	    <manifest>
+	        <attribute name="Main-Class" value="com.test.guisort.Main" />
+		<attribute name="Built-By" value="${user.name}" />
+		<section name="GUISort" >
+		    <attribute name="Specification-Title" value="GUISort" />
+		    <attribute name="Specification-Version"
+		     value="${version}" />
+		    <attribute name="Specification-Vendor"
+		     value="Nicholas DiPasquale" />
+		    <attribute name="Implementation-Title" value="GUISort" />
+		    <attribute name="Implementation-Version"
+		     value="${version} ${TODAY}" />
+		    <attribute name="Implementation-Vendor"
+		     value="Nicholas DiPasquale" />
+		</section>
+	    </manifest>
+	</jar>
+    </target>
+
+    <target name="docs"
+     depends="compile"
+     description="Generate Javadoc Documentation"
+     >
+        <mkdir dir="docs" />
+
+	<javadoc sourcepath="src"
+	 link="http://java.sun.com/j2se/1.5.0/docs/api"
+	 packagenames="*"
+	 destdir="docs"
+	 >
+	    <classpath refid="compile.classpath" />
+	</javadoc>
+    </target>
+
+    <target name="test" depends="compile"
+     description="Run JUnit test framework"
+     >
+        <mkdir dir="docs/test" />
+	
+	<junit printsummary="yes" haltonfailure="no" >
+	    <classpath refid="compile.classpath" />
+
+	    <formatter type="xml" />
+
+	    <batchtest fork="yes" todir="docs/test" >
+	        <fileset dir="src" >
+		    <include name="**/testcase/*.java" />
+		</fileset>
+	    </batchtest>
+	</junit>
+
+	<junitreport todir="docs/test" >
+	    <fileset dir="docs/test" >
+	        <include name="TEST-*.xml" />
+	    </fileset>
+	    <report format="frames" todir="docs/test" />
+	</junitreport>
+    </target>
+
+    <target name="clean" >
+        <delete file="{$dest.filename}" quiet="true" />
+	<delete dir="bin" quiet="true" />
+    </target>
+
+    <target name="all" depends="compile, docs" >
+    </target>
+
+</project>
